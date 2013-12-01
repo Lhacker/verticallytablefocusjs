@@ -12,10 +12,11 @@
       throw new Error("applyVerticalTableFocus: Invalid selector. please select table element.");
 
     // add event
-    if (canUseOnMethod()) {
-      $self.on("keydown", "input:visible,select,textarea", verticalMovementEventHandler);  
+    if ($.isFunction($.fn.on)) {
+      $self.on("keydown", "input:visible,select", verticalMovementEventHandler);  
     } else {
-      $(document).delegate($self.selector + " input:visible,select,textarea", "keydown", verticalMovementEventHandler);  
+      var selector = $self.selector + " input:visible, " + $self.selector + " select";
+      $(document).delegate(selector, "keydown", verticalMovementEventHandler);  
     }
 
   };
@@ -40,58 +41,55 @@
     
     if (e.shiftKey) { // press shift + enter, focus up
        
-      // col
-      for (var cIdx = targetColIdx; cIdx !== targetColIdx + 1;) {
-        
-        // row
-        for (var rIdx = targetRowIdx; rIdx !== targetRowIdx + 1;) {
+      for (var cIdx = targetColIdx, rIdx = targetRowIdx;;) {
           
-          // break condition
-          if (--rIdx < 0) {
-            rIdx = rowLength - 1;
-            if (--cIdx < 0)
-              cIdx = colLength - 1;
-          }
-          var $focusableItem = $rows.eq(rIdx).find("td,th").eq(cIdx).find(":focusable").first(); 
-          if ($focusableItem.length > 0) {
-            $focusableItem.focus();
-            e.preventDefault();
-            return false;
-          }
-        
+        // break condition
+        if (--rIdx < 0) {
+          rIdx = rowLength - 1;
+          if (--cIdx < 0)
+            cIdx = colLength - 1;
         }
 
+        // end condition
+        if (rIdx === targetRowIdx && cIdx === targetColIdx)
+          return true;
+
+        var $focusableItem = findFocusable($rows.eq(rIdx).find("td,th").eq(cIdx)).first(); 
+        if ($focusableItem.length > 0) {
+          $focusableItem.focus();
+          e.preventDefault();
+          return true;
+        }
+        
       }
 
     } else {  // press enter, focus down
-
-      // col
-      for (var cIdx = targetColIdx; cIdx !== targetColIdx - 1;) {
-        
-        // row
-        for (var rIdx = targetRowIdx; rIdx !== targetRowIdx - 1;) {
+       
+      for (var cIdx = targetColIdx, rIdx = targetRowIdx;;) {
           
-          // break condition
-          if (++rIdx >= rowLength) {
-            rIdx = 0;
-            if (++cIdx >= colLength)
-              cIdx = 0;
-          }
-          var $focusableItem = findFocusable($rows.eq(rIdx).find("td,th").eq(cIdx)).first(); 
-          if ($focusableItem.length > 0) {
-            $focusableItem.focus();
-            e.preventDefault();
-            return false;
-          }
-        
+        // break condition
+        if (++rIdx >= rowLength) {
+          rIdx = 0;
+          if (++cIdx >= colLength)
+            cIdx = 0;
         }
 
+        // end condition
+        if (rIdx === targetRowIdx && cIdx === targetColIdx)
+          return true;
+
+        var $focusableItem = findFocusable($rows.eq(rIdx).find("td,th").eq(cIdx)).first(); 
+        if ($focusableItem.length > 0) {
+          $focusableItem.focus();
+          e.preventDefault();
+          return true;
+        }
+      
       }
 
     }
 
   };
-
 
   var findFocusable = function($target) {
     return $target
@@ -102,17 +100,5 @@
         return $self.is(":visible") || $self.attr("tabIndex") >= 0;
       });
   };
-
-  var isjQueryVersionGreaterThanEqual = function(strVersion) {
-    var versionArray = $().jquery.split(".");
-    var paramVersionArray = strVersion.split(".");
-    return parseInt(versionArray[0]) >= parseInt(paramVersionArray[0]) &&
-      parseInt(versionArray[1]) >= parseInt(paramVersionArray[1]) &&
-      parseInt(versionArray[2]) >= parseInt(paramVersionArray[2]);
-  }
-
-  var canUseOnMethod = function() {
-    return isjQueryVersionGreaterThanEqual("1.7.0");
-  }
 
 })(jQuery);
