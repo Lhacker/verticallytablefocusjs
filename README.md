@@ -1,4 +1,4 @@
-# Vertical forcus on table
+# Vertical focus on table
 
 ## This is a jquery plugin.
 
