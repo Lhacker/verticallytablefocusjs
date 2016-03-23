@@ -8,8 +8,15 @@ if you push "Enter" or "Shift + Enter", you can move your focus vertically.
 
 please read jquery.verticallytablefocus.js .
 
-```javascript
+```html
 <head>
   <script type="text/javascript" src="./jquery.verticallytablefocus.js"></script>
 </head>
+```
+
+and then apply verticallytablefocus function.
+
+```javascript
+// apply vertical table focus.  
+$("#target_table").applyVerticalTableFocus();
 ```
